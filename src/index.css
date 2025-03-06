@@ -3,11 +3,11 @@
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
-  font-weight: 400;
+  font-weight: 1000;
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background: linear-gradient(to right, #fda4af, #c4b5fd, #818cf8);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -27,9 +27,12 @@ a:hover {
 body {
   margin: 0;
   display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  justify-content: center;  /* Centra horizontalmente */
+  align-items: center;      /* Centra verticalmente */
+  height: 100vh;            /* Usa el 100% del alto de la pantalla */
+  width: 100vw;             /* Usa el 100% del ancho de la pantalla */
+  min-width: unset;         /* Elimina restricciones innecesarias */
+  min-height: unset;
 }
 
 h1 {

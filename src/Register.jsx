@@ -57,20 +57,26 @@ export default function RegisterForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto p-4 border rounded-lg shadow-lg">
-      {Object.values(errors).map((err, i) => (
-        <div key={i} className="text-red-500 text-sm">{err}</div>
-      ))}
-      <input type="email" name="email" placeholder="Email" onChange={handleChange} className="border p-2 w-full" />
-      <input type="password" name="password" placeholder="Password" onChange={handleChange} className="border p-2 w-full" />
-      <input type="password" name="confirm_password" placeholder="Confirm Password" onChange={handleChange} className="border p-2 w-full" />
-      <input type="text" name="phone" placeholder="Phone Number" onChange={handleChange} className="border p-2 w-full" />
-      <input type="text" name="pin" placeholder="PIN (6 digits)" onChange={handleChange} className="border p-2 w-full" />
-      <input type="text" name="name" placeholder="First Name" onChange={handleChange} className="border p-2 w-full" />
-      <input type="text" name="lastname" placeholder="Last Name" onChange={handleChange} className="border p-2 w-full" />
-      <input type="text" name="country" placeholder="Country" onChange={handleChange} className="border p-2 w-full" />
-      <input type="date" name="birthdate" onChange={handleChange} className="border p-2 w-full" />
-      <button type="submit" className="bg-blue-500 text-white p-2 w-full rounded">Register</button>
-    </form>
+    <div className="max-w-md mx-auto p-6 border rounded-lg shadow-lg bg-white">
+      <h2 className="text-2xl font-bold text-center text-indigo-700 mb-4">Register user</h2>
+  
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {Object.values(errors).map((err, i) => (
+          <div key={i} className="text-red-500 text-sm">{err}</div>
+        ))}
+        
+        <input type="email" name="email" placeholder="Email" onChange={handleChange} className="border p-2 w-full text-black" />
+        <input type="password" name="password" placeholder="Password" onChange={handleChange} className="border p-2 w-full text-black" />
+        <input type="password" name="confirm_password" placeholder="Confirm Password" onChange={handleChange} className="border p-2 w-full text-black" />
+        <input type="text" name="phone" placeholder="Phone Number" onChange={handleChange} className="border p-2 w-full text-black" />
+        <input type="text" name="pin" placeholder="PIN (6 digits)" onChange={handleChange} className="border p-2 w-full text-black" />
+        <input type="text" name="name" placeholder="First Name" onChange={handleChange} className="border p-2 w-full text-black" />
+        <input type="text" name="lastname" placeholder="Last Name" onChange={handleChange} className="border p-2 w-full text-black" />
+        <input type="text" name="country" placeholder="Country" onChange={handleChange} className="border p-2 w-full text-black" />
+        <input type="date" name="birthdate" onChange={handleChange} className="border p-2 w-full text-black" />
+  
+        <button type="submit" className="bg-blue-500 text-white p-2 w-full rounded">Register</button>
+      </form>
+    </div>
   );
 }
