@@ -1,81 +1,74 @@
-import { useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";  // React Router v6
+import React, { useState } from 'react';
+import axios from 'axios';
 
-export default function LoginForm() {
-  const [formData, setFormData] = useState({ email: "", password: "" });
-  const [errors, setErrors] = useState({});
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+const Login = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrors({});
-    setLoading(true);
+  const handleLogin = async (e) => {
+    e.preventDefault(); // Prevents the default form behavior
 
     try {
-      const response = await axios.post("http://localhost:8000/api/login", formData);
-      
-      alert("Login successful");
-      console.log(response.data);
-      localStorage.setItem("user", JSON.stringify(response.data.user)); // Save user data
+      const response = await axios.post('http://localhost:8000/api/login', {
+        email,
+        password,
+      });
 
-      navigate("/dashboard"); // Redirect after login
+      // If the response is successful
+      setMessage(<p className="text-green-500">{response.data.message}</p>);
+      console.log(response.data.user); // You can handle the user response as needed
     } catch (error) {
-      if (error.response) {
-        setErrors(error.response.data.errors || { general: error.response.data.error });
-      }
-    } finally {
-      setLoading(false);
+      // If there's an error
+      const errorMessage = error.response?.data?.error || 'There was a problem logging in.';
+      setMessage(<p className="text-red-500">{errorMessage}</p>);
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
-      <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto p-4 border rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold text-center">Sign In</h2>
+    <div className="flex justify-center items-center min-h-screen w-full bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-300">
+      <div className="w-full max-w-md p-6 md:p-8 bg-white rounded-2xl shadow-xl border-2 border-gray-200">
+        <h2 className="text-3xl font-bold text-center text-indigo-600 mb-6">Welcome back!</h2>
 
-        {errors.general && <div className="text-red-500 text-sm">{errors.general}</div>}
+        {message && <div className="mb-4">{message}</div>}
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          className="border p-2 w-full rounded"
-        />
-        {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
+        <form onSubmit={handleLogin}>
+          <div className="mb-5">
+            <label htmlFor="email" className="block text-lg text-gray-700 font-medium">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-4 border-2 border-gray-300 rounded-xl mt-2 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-black"
+              placeholder="Enter your email"
+              required
+            />
+          </div>
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          className="border p-2 w-full rounded"
-        />
-        {errors.password && <p className="text-red-500 text-xs">{errors.password}</p>}
+          <div className="mb-5">
+            <label htmlFor="password" className="block text-lg text-gray-700 font-medium">Password</label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-4 border-2 border-gray-300 rounded-xl mt-2 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-black"
+              placeholder="Enter your password"
+              required
+            />
+          </div>
 
-        <button
-          type="submit"
-          className={`w-full py-2 rounded bg-blue-500 text-white ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'}`}
-          disabled={loading}
-        >
-          {loading ? "Loading..." : "Sign In"}
-        </button>
-
-        <div className="text-center mt-4">
-          <span className="text-sm">Don't have an account? </span>
-          <button type="button" className="text-blue-500 hover:underline" onClick={() => navigate("/register")}>
-            Register here
+          <button
+            type="submit"
+            className="w-full py-3 mt-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white text-lg font-semibold rounded-lg hover:from-pink-600 hover:to-purple-600 focus:outline-none focus:ring-4 focus:ring-purple-300"
+          >
+            Log In
           </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
-}
+};
+
+export default Login;
