@@ -4,12 +4,14 @@ import viteLogo from '/vite.svg'
 import './App.css'
 
 import Register from './Register'
+import Login from './Login'
 
 function App() {
   const [count, setCount] = useState(0)
 
   return (
     <>
+   
    <Register/>
     </>
   )
