@@ -1,7 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Register from './Register';
 import Login from './Login';
-import Dashboard from './Dashboard';  
+import HomeScreen from './HomeScreen';  
+import RestrictedUser from './RestrictedUser';
 
 function App() {
   return (
@@ -14,7 +15,9 @@ function App() {
         <Route path="/register" element={<Register />} />
         
         {/* Ruta para la pagina principal */}
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/HomeScreen" element={<HomeScreen />} />
+        
+        <Route path="/RestrictedUser" element={<RestrictedUser />} />
       </Routes>
     </Router>
   );

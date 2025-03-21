@@ -10,24 +10,26 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
+  
     try {
       const response = await axios.post('http://localhost:8000/api/login', {
         email,
         password,
       });
-
+  
+      // Almacenar el token en localStorage
+      localStorage.setItem('auth_token', response.data.token);
+  
       setMessage(<p className="text-green-500">{response.data.message}</p>);
-
-      // Si el login es exitoso, redirigimos a la página de Dashboard
-      navigate('/dashboard'); // Esto redirige a /dashboard
-
+  
+      // Si el login es exitoso, redirigir a la página de Dashboard
+      navigate('/HomeScreen'); // Esto redirige a /HomeScreen
+  
     } catch (error) {
       const errorMessage = error.response?.data?.error || 'There was a problem logging in.';
       setMessage(<p className="text-red-500">{errorMessage}</p>);
     }
   };
-
   return (
     <div className="flex justify-center items-center min-h-screen">
       <div className="w-96 h-auto p-8 border-2 border-gray-200 bg-white rounded-lg shadow-xl backdrop-blur-md flex flex-col">
