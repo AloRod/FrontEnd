@@ -57,26 +57,55 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 border rounded-lg shadow-lg bg-white">
-      <h2 className="text-2xl font-bold text-center text-indigo-700 mb-4">Register user</h2>
-  
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {Object.values(errors).map((err, i) => (
-          <div key={i} className="text-red-500 text-sm">{err}</div>
-        ))}
-        
-        <input type="email" name="email" placeholder="Email" onChange={handleChange} className="border p-2 w-full text-black" />
-        <input type="password" name="password" placeholder="Password" onChange={handleChange} className="border p-2 w-full text-black" />
-        <input type="password" name="confirm_password" placeholder="Confirm Password" onChange={handleChange} className="border p-2 w-full text-black" />
-        <input type="text" name="phone" placeholder="Phone Number" onChange={handleChange} className="border p-2 w-full text-black" />
-        <input type="text" name="pin" placeholder="PIN (6 digits)" onChange={handleChange} className="border p-2 w-full text-black" />
-        <input type="text" name="name" placeholder="First Name" onChange={handleChange} className="border p-2 w-full text-black" />
-        <input type="text" name="lastname" placeholder="Last Name" onChange={handleChange} className="border p-2 w-full text-black" />
-        <input type="text" name="country" placeholder="Country" onChange={handleChange} className="border p-2 w-full text-black" />
-        <input type="date" name="birthdate" onChange={handleChange} className="border p-2 w-full text-black" />
-  
-        <button type="submit" className="bg-blue-500 text-white p-2 w-full rounded">Register</button>
-      </form>
+    <div className="h-screen w-screen flex justify-center items-center bg-black">
+      <div className="bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full">
+        <h2 className="text-2xl font-bold text-center text-white mb-4">Register User</h2>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {Object.values(errors).map((err, i) => (
+            <div key={i} className="text-red-400 text-sm">{err}</div>
+          ))}
+
+          <input type="email" name="email" placeholder="Email" onChange={handleChange} 
+            className="border p-2 w-full bg-gray-700 text-white rounded" />
+          <input type="password" name="password" placeholder="Password" onChange={handleChange} 
+            className="border p-2 w-full bg-gray-700 text-white rounded" />
+          <input type="password" name="confirm_password" placeholder="Confirm Password" onChange={handleChange} 
+            className="border p-2 w-full bg-gray-700 text-white rounded" />
+          <input type="text" name="phone" placeholder="Phone Number" onChange={handleChange} 
+            className="border p-2 w-full bg-gray-700 text-white rounded" />
+          <input type="text" name="pin" placeholder="PIN (6 digits)" onChange={handleChange} 
+            className="border p-2 w-full bg-gray-700 text-white rounded" />
+          <input type="text" name="name" placeholder="First Name" onChange={handleChange} 
+            className="border p-2 w-full bg-gray-700 text-white rounded" />
+          <input type="text" name="lastname" placeholder="Last Name" onChange={handleChange} 
+            className="border p-2 w-full bg-gray-700 text-white rounded" />
+
+          <select name="country" onChange={handleChange} 
+            className="border p-2 w-full bg-gray-700 text-white rounded">
+            <option value="">Select a country</option>
+            <option value="USA">United States</option>
+            <option value="Mexico">Mexico</option>
+            <option value="Canada">Canada</option>
+            <option value="Spain">Spain</option>
+            <option value="Germany">Germany</option>
+            <option value="France">France</option>
+            <option value="Brazil">Brazil</option>
+            <option value="Argentina">Argentina</option>
+            <option value="Colombia">Colombia</option>
+            <option value="Chile">Chile</option>
+            <option value="Peru">Peru</option>
+          </select>
+
+          <input type="date" name="birthdate" onChange={handleChange} 
+            className="border p-2 w-full bg-gray-700 text-white rounded" />
+
+          <button type="submit" 
+            className="bg-blue-500 hover:bg-blue-600 text-white p-2 w-full rounded">
+            Register
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
