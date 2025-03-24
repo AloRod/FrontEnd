@@ -4,7 +4,7 @@ import Login from './Login';
 import HomeScreen from './HomeScreen';  
 import AdminDashboard from './AdminDasshboard';
 import UsersRList from './UsersRList';
-
+import VideoList from './VideoList';
 
 function App() {
   return (
@@ -22,6 +22,10 @@ function App() {
         
         <Route path="/AdminDasshboard" element={<AdminDashboard />} />
         <Route path="/UserRList" element={<UsersRList />} />
+      
+        {/* Nueva ruta para la gestión de playlists y videos */}
+        <Route path="/VideoList" element={<VideoList />} />
+        
       </Routes>
     </Router>
   );

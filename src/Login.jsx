@@ -16,9 +16,12 @@ const Login = () => {
         password,
       });
 
+      // Guardar el token y el userId en localStorage
       localStorage.setItem('auth_token', response.data.token);
+      localStorage.setItem('user_id', response.data.user.id); // Asumiendo que la respuesta tiene el id del usuario
+
       setMessage(<p className="text-green-500">{response.data.message}</p>);
-      navigate('/HomeScreen');
+      navigate('/HomeScreen'); // Redirigir a la pantalla de inicio
     } catch (error) {
       const errorMessage = error.response?.data?.error || 'There was a problem logging in.';
       setMessage(<p className="text-red-500">{errorMessage}</p>);
@@ -26,7 +29,6 @@ const Login = () => {
   };
 
   return (
-    
     <div className="h-screen w-screen flex justify-center items-center bg-black">
       <div className="w-full max-w-md p-8 rounded-lg shadow-lg bg-gray-800 ">
         <h2 className="text-3xl font-bold text-center text-rose-800 mb-6 ">Welcome KidsYT</h2>
@@ -72,4 +74,3 @@ const Login = () => {
 };
 
 export default Login;
-
