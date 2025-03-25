@@ -5,6 +5,7 @@ import HomeScreen from './HomeScreen';
 import AdminDashboard from './AdminDasshboard';
 import UsersRList from './UsersRList';
 import VideoList from './VideoList';
+import PlaylistManager from './PlaylistManager';
 
 function App() {
   return (
@@ -26,6 +27,9 @@ function App() {
         {/* Nueva ruta para la gestión de playlists y videos */}
         <Route path="/VideoList" element={<VideoList />} />
         
+        {/* Ruta para gestionar todas las playlists */}
+        <Route path="/PlaylistManager" element={<PlaylistManager />} />
+
       </Routes>
     </Router>
   );
