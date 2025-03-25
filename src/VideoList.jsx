@@ -96,12 +96,6 @@ const VideoList = () => {
         {error && <p className="text-red-500 mb-4">{error}</p>}
 
         <div className="mb-4 flex gap-2">
-          <button
-            className="bg-indigo-600 text-white px-4 py-2 rounded"
-            onClick={() => setShowPlaylistForm(true)}
-          >
-            {selectedPlaylist ? 'Editar Playlist' : 'Agregar Playlist'}
-          </button>
           {selectedPlaylist && !showVideoForm.visible && (
             <button
               className="bg-green-600 text-white px-4 py-2 rounded"
