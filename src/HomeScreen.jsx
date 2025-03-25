@@ -97,7 +97,7 @@ const HomeScreen = () => {
           </div>
           <button
             type="submit"
-            className="w-full py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition duration-300"
+            className="w-full py-2 px-4 bg-red-600 text-white font-medium text-sm rounded-lg hover:bg-red-700 transition duration-300"
           >
             Acceder
           </button>
@@ -111,14 +111,14 @@ const HomeScreen = () => {
                 <div
                   key={user.id}
                   onClick={() => setSelectedUser(user)}
-                  className="w-24 h-24 bg-gray-700 rounded-full cursor-pointer hover:opacity-80 transition duration-300"
+                  className="w-32 h-32 bg-gray-700 rounded-full cursor-pointer hover:opacity-90 transition duration-300 transform hover:scale-110"
                 >
                   <img
-                    src={user.avatar || 'https://via.placeholder.com/150'}
-                    alt={user.name}
-                    className="w-full h-full object-cover rounded-full border-2 border-gray-600"
+                    src={user.avatar_url}
+                    alt={user.fullname}
+                    className="w-full h-full object-cover rounded-full border-4 border-white"
                   />
-                  <p className="text-center text-white mt-2 text-sm">{user.name}</p>
+                  <p className="text-center text-white mt-2 text-lg font-semibold">{user.fullname}</p>
                 </div>
               ))
             ) : (
@@ -154,3 +154,4 @@ const HomeScreen = () => {
 };
 
 export default HomeScreen;
+

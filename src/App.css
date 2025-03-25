@@ -7,7 +7,7 @@
 
 body {
   font-family: 'Roboto', sans-serif;
-  background: linear-gradient(135deg, #7f7b7b, #afb6ba); /* Fondo elegante */
+  background: linear-gradient(black); 
   display: flex;
   align-items: center;
   justify-content: center;
@@ -88,6 +88,28 @@ body {
   color: #357ABD;
 }
 
+/* navbar.css */
+.navbar {
+  width: 100%;
+  background-color: #333;  /* Color de fondo */
+  color: white; /* Color del texto */
+  padding: 10px 0;  /* Espaciado */
+  text-align: center;
+  font-size: 20px;
+  position: relative; /* Esto permite que se mueva con el contenido */
+  top: 0; /* Asegura que se mantenga en la parte superior al principio */
+  z-index: 10; /* Asegura que esté por encima de otros elementos */
+}
 
+.navbar a {
+  text-decoration: none;
+  color: white;
+  padding: 10px 20px;
+  margin: 0 10px;
+}
+
+.navbar a:hover {
+  background-color: #555;
+}
 
 

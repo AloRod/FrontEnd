@@ -5,24 +5,17 @@ import axios from 'axios';
 const UsersRList = () => {
     const [users, setUsers] = useState([]);
     const [isAdding, setIsAdding] = useState(false);
-    const [newUser, setNewUser] = useState({
-        fullname: '',
-        pin: '',
-        avatar: ''
-    });
-    const [imagePreview, setImagePreview] = useState(null);  // Para mostrar la imagen seleccionada
+    const [newUser, setNewUser] = useState({ fullname: '', pin: '', avatar: null });
+    const [imagePreview, setImagePreview] = useState(null);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    // Obtener la lista de usuarios restringidos
     useEffect(() => {
         const fetchUsers = async () => {
             try {
                 const token = localStorage.getItem('auth_token');
                 const response = await axios.get('http://localhost:8000/api/restrictedUsers', {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+                    headers: { Authorization: `Bearer ${token}` },
                 });
                 setUsers(response.data);
             } catch (error) {
@@ -33,185 +26,99 @@ const UsersRList = () => {
         fetchUsers();
     }, []);
 
-    // Manejar la selección de imagen para el avatar
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setNewUser({ ...newUser, avatar: file.name });  // Guardamos el nombre del archivo
-                setImagePreview(reader.result);  // Mostramos la imagen seleccionada
+                setNewUser({ ...newUser, avatar: file });
+                setImagePreview(reader.result);
             };
             reader.readAsDataURL(file);
         }
     };
 
-    // Manejar la selección de una imagen predefinida
-    const handleImageSelect = (imageName) => {
-        setNewUser({ ...newUser, avatar: imageName });
-        setImagePreview(`path_to_images/${imageName}`);  // Ruta a la imagen predefinida
-    };
-
-    // Agregar un nuevo usuario restringido
     const handleAddUser = async () => {
         if (!newUser.fullname || !newUser.pin || !newUser.avatar) {
             setError('Todos los campos son requeridos.');
             return;
         }
-        if (newUser.pin.length !== 6 || isNaN(newUser.pin)) {
-            setError('El PIN debe ser un número de 6 dígitos.');
-            return;
-        }
+
+        const formData = new FormData();
+        formData.append('fullname', newUser.fullname);
+        formData.append('pin', newUser.pin);
+        formData.append('avatar', newUser.avatar);
 
         try {
-            await axios.post('http://localhost:8000/api/CreaterestrictedUsers', newUser, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
-                }
+            await axios.post('http://localhost:8000/api/CreaterestrictedUsers', formData, {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` },
             });
 
-            setIsAdding(false); // Cerrar formulario de agregar
-            setNewUser({ fullname: '', pin: '', avatar: '' }); // Limpiar formulario
-            setImagePreview(null); // Limpiar la vista previa
-            setError(null); // Limpiar error
-
-            // Actualizar la lista de usuarios
+            setIsAdding(false);
+            setNewUser({ fullname: '', pin: '', avatar: null });
+            setImagePreview(null);
+            setError(null);
+            
             const response = await axios.get('http://localhost:8000/api/restrictedUsers', {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
-                }
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
             });
             setUsers(response.data);
         } catch (error) {
-            console.error('Error al agregar usuario', error);
             setError('Hubo un error al agregar el usuario.');
         }
     };
 
-    // Eliminar un usuario restringido
     const handleDeleteUser = async (id) => {
         try {
-            await axios.delete(`http://localhost:8000/api/DeleterestrictedUsers/${id}`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
-                }
+            await axios.delete(`http://localhost:8000/api/DeleteUserRestricted/${id}`, {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
             });
-
-            // Actualizar la lista de usuarios
-            const response = await axios.get('http://localhost:8000/api/restrictedUsers', {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
-                }
-            });
-            setUsers(response.data);
+            setUsers(users.filter(user => user.id !== id));
         } catch (error) {
             console.error('Error al eliminar usuario', error);
-            setError('Hubo un error al eliminar el usuario.');
         }
     };
 
-    // Editar usuario restringido
     const handleEditUser = (user) => {
-        navigate(`/editUser/${user.id}`, { state: { user } });
+        navigate(`/EditUserR/${user.id}`, { state: { user } });
     };
 
     return (
-        <div>
-            {error && <p className="text-red-500">{error}</p>} {/* Mostrar error si existe */}
-            
-            {/* Botón para agregar nuevo usuario */}
+        <div className="h-screen w-screen flex flex-col justify-center items-center bg-black p-6">
+            {error && <p className="text-red-500 mb-4">{error}</p>}
             {!isAdding && (
-                <button 
-                    onClick={() => setIsAdding(true)} 
-                    className="bg-green-600 text-white p-2 rounded mb-4 hover:bg-green-700"
-                >
+                <button onClick={() => setIsAdding(true)} className="bg-green-600 text-white p-2 rounded mb-4 hover:bg-green-700">
                     Agregar Nuevo Usuario
                 </button>
             )}
-
-            {/* Formulario para agregar un nuevo usuario */}
             {isAdding && (
-                <div className="mb-6 p-4 border border-gray-300 rounded-lg shadow-md bg-blue-950">
+                <div className="w-full max-w-lg bg-gray-800 text-white p-4 rounded-lg">
                     <h3 className="text-xl font-semibold mb-4">Agregar Nuevo Usuario</h3>
-                    <div>
-                        <input
-                            type="text"
-                            placeholder="Nombre completo"
-                            value={newUser.fullname}
-                            onChange={(e) => setNewUser({ ...newUser, fullname: e.target.value })}
-                            className="mb-2 p-2 border border-gray-300 rounded w-full"
-                        />
-                    </div>
-                    <div>
-                        <input
-                            type="text"
-                            placeholder="PIN"
-                            value={newUser.pin}
-                            onChange={(e) => setNewUser({ ...newUser, pin: e.target.value })}
-                            className="mb-2 p-2 border border-gray-300 rounded w-full"
-                        />
-                    </div>
-
-                    {/* Selector de imagen (Archivo) */}
-                    <div className="mb-4">
-                        <input
-                            type="file"
-                            onChange={handleImageChange}
-                            className="p-2 border border-gray-300 rounded w-full"
-                        />
-                        {imagePreview && (
-                            <div className="mt-2">
-                                <img src={imagePreview} alt="Vista previa" className="w-32 h-32 object-cover rounded" />
-                            </div>
-                        )}
-                    </div>
-
-                    <div>
-                        <button
-                            onClick={handleAddUser}
-                            className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
-                        >
-                            Agregar Usuario
-                        </button>
-                    </div>
+                    <input type="text" placeholder="Nombre completo" value={newUser.fullname} onChange={(e) => setNewUser({ ...newUser, fullname: e.target.value })} className="mb-2 p-2 w-full rounded text-black" />
+                    <input type="text" placeholder="PIN" value={newUser.pin} onChange={(e) => setNewUser({ ...newUser, pin: e.target.value })} className="mb-2 p-2 w-full rounded text-black" />
+                    <input type="file" onChange={handleImageChange} className="p-2 w-full rounded" />
+                    <button onClick={handleAddUser} className="bg-blue-600 text-white p-2 rounded mt-4 w-full hover:bg-blue-700">
+                        Agregar Usuario
+                    </button>
                 </div>
             )}
-
-            {/* Lista de usuarios */}
-            <ul>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl mt-6">
                 {users.map((user) => (
-                    <li key={user.id} className="flex flex-col md:flex-row items-center justify-between mb-6 p-4 border border-gray-300 rounded-lg shadow-md bg-white">
-                        <div className="flex flex-col md:flex-row items-center w-full">
-                            <img
-                                src={`path_to_images/${user.avatar}`} // Asegúrate de que la ruta sea correcta
-                                alt={user.fullname}
-                                className="w-16 h-16 rounded-full mb-4 md:mb-0 md:mr-4"
-                            />
-                            <div className="flex flex-col md:flex-row md:items-center w-full">
-                                <div className="md:mr-6">
-                                    <h3 className="text-xl font-semibold">{user.fullname}</h3>
-                                    <p className="text-gray-500">PIN: {user.pin}</p>
-                                </div>
-
-                                <div className="mt-4 md:mt-0 flex space-x-4">
-                                    <button
-                                        onClick={() => handleEditUser(user)}
-                                        className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
-                                    >
-                                        Editar
-                                    </button>
-                                    <button
-                                        onClick={() => handleDeleteUser(user.id)}
-                                        className="bg-red-600 text-white p-2 rounded hover:bg-red-700"
-                                    >
-                                        Eliminar
-                                    </button>
-                                </div>
-                            </div>
+                    <div key={user.id} className="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
+                        <img src={user.avatar_url} alt={user.fullname} className="w-24 h-24 rounded-full mb-4" />
+                        <h3 className="text-xl font-semibold text-black">{user.fullname}</h3>
+                        <p className="text-gray-500">PIN: {user.pin}</p>
+                        <div className="flex space-x-4 mt-4">
+                            <button onClick={() => handleEditUser(user)} className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
+                                Editar
+                            </button>
+                            <button onClick={() => handleDeleteUser(user.id)} className="bg-red-600 text-white p-2 rounded hover:bg-red-700">
+                                Eliminar
+                            </button>
                         </div>
-                    </li>
+                    </div>
                 ))}
-            </ul>
+            </div>
         </div>
     );
 };
