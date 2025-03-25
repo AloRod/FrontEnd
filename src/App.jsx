@@ -1,38 +1,106 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Register from './Register';
 import Login from './Login';
-import HomeScreen from './HomeScreen';  
-import AdminDashboard from './AdminDasshboard';
+import HomeScreen from './HomeScreen';
+import AdminDasshboard from './AdminDasshboard';
 import UsersRList from './UsersRList';
 import VideoList from './VideoList';
+import UserRForm from './UserRForm';
 import PlaylistManager from './PlaylistManager';
+import Navbar from './Navbar'; // Importa el Navbar
+
+// Componente para proteger rutas
+const ProtectedRoute = ({ children }) => {
+    const token = localStorage.getItem('auth_token');
+
+    if (!token) {
+        // Si no hay token, redirige al login
+        return <Navigate to="/" />;
+    }
+
+    return children;
+};
 
 function App() {
-  return (
-    <Router>
-      <Routes>
-      
-        {/* Página principal será el Login */}
-        <Route path="/" element={<Login />} />
-        
-        {/* Página de registro */}
-        <Route path="/register" element={<Register />} />
-        
-        {/* Ruta para la pagina principal */}
-        <Route path="/HomeScreen" element={<HomeScreen />} />
-        
-        <Route path="/AdminDasshboard" element={<AdminDashboard />} />
-        <Route path="/UserRList" element={<UsersRList />} />
-      
-        {/* Nueva ruta para la gestión de playlists y videos */}
-        <Route path="/VideoList" element={<VideoList />} />
-        
-        {/* Ruta para gestionar todas las playlists */}
-        <Route path="/PlaylistManager" element={<PlaylistManager />} />
+    return (
+        <Router>
+            <Routes>
+                {/* Página principal será el Login */}
+                <Route path="/" element={<Login />} />
 
-      </Routes>
-    </Router>
-  );
+                {/* Página de registro */}
+                <Route path="/register" element={<Register />} />
+
+                {/* Rutas protegidas */}
+                <Route
+                    path="/HomeScreen"
+                    element={
+                        <ProtectedRoute>
+                            <>
+                                <Navbar />
+                                <HomeScreen />
+                            </>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/AdminDasshboard"
+                    element={
+                        <ProtectedRoute>
+                            <>
+                                <Navbar />
+                                <AdminDasshboard />
+                            </>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/UserRList"
+                    element={
+                        <ProtectedRoute>
+                            <>
+                                <Navbar />
+                                <UsersRList />
+                            </>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/UserRForm"
+                    element={
+                        <ProtectedRoute>
+                            <>
+                                <Navbar />
+                                <UserRForm />
+                            </>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/VideoList"
+                    element={
+                        <ProtectedRoute>
+                            <>
+                                <Navbar />
+                                <VideoList />
+                            </>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/PlaylistManager"
+                    element={
+                        <ProtectedRoute>
+                            <>
+                                <Navbar />
+                                <PlaylistManager />
+                            </>
+                        </ProtectedRoute>
+                    }
+                />
+            </Routes>
+        </Router>
+    );
 }
 
 export default App;
