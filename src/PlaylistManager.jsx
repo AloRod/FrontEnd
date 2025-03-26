@@ -9,6 +9,7 @@ const PlaylistManager = () => {
   const [description, setDescription] = useState('');
   const [editingPlaylistId, setEditingPlaylistId] = useState(null);
   const [associatedProfiles, setAssociatedProfiles] = useState([]); // Array de IDs de perfiles asociados
+  const [restrictedUsers, setRestrictedUsers] = useState([]); // Lista de usuarios restringidos
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -23,6 +24,7 @@ const PlaylistManager = () => {
     headers: { Authorization: `Bearer ${getToken()}` },
   });
 
+  // Obtener playlists
   useEffect(() => {
     const token = getToken();
     if (!token) {
@@ -45,6 +47,19 @@ const PlaylistManager = () => {
       .catch((error) => {
         console.error('Error fetching playlists:', error);
         setError('Hubo un error al cargar las playlists.');
+      });
+  }, []);
+
+  // Obtener usuarios restringidos
+  useEffect(() => {
+    axios
+      .get(`${API_URL}/restrictedUsers`, getAuthHeaders())
+      .then((response) => {
+        setRestrictedUsers(response.data); // Guardar la lista de usuarios restringidos
+      })
+      .catch((error) => {
+        console.error('Error fetching restricted users:', error);
+        setError('Hubo un error al cargar los usuarios restringidos.');
       });
   }, []);
 
@@ -174,17 +189,24 @@ const PlaylistManager = () => {
         </div>
         <div className="mb-2">
           <label className="block text-sm font-medium text-gray-700">
-            IDs de Perfiles Asociados (separados por comas)
+            Usuarios Restringidos Asociados (mantén presionado Ctrl/Cmd para seleccionar varios)
           </label>
-          <input
-            type="text"
-            placeholder="Ejemplo: 1,2,3"
-            value={associatedProfiles.join(',')}
+          <select
+            multiple
+            value={associatedProfiles}
             onChange={(e) =>
-              setAssociatedProfiles(e.target.value.split(',').map((id) => id.trim()))
+              setAssociatedProfiles(
+                Array.from(e.target.selectedOptions, (option) => option.value)
+              )
             }
             className="border p-2 w-full"
-          />
+          >
+            {restrictedUsers.map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.fullname} (ID: {user.id})
+              </option>
+            ))}
+          </select>
         </div>
         <div className="flex gap-2">
           <button
