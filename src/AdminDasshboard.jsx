@@ -1,63 +1,58 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const AdminDashboard = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        navigate('/');
-    };
+  // Function to log out
+  const handleLogout = () => {
+    localStorage.removeItem("auth_token");
+    navigate("/");
+  };
 
-    return (
-        <div className="h-screen w-screen bg-black">
-        {/* Contenedor principal con padding-top */}
-        <div className="pt-20"> {/* Espacio para el Navbar */}
-            <div className="flex justify-center items-center h-full">
-                <div className="w-full max-w-md p-8 rounded-lg shadow-lg bg-gray-800">
-                    <h2 className="text-3xl font-semibold text-red-900 mb-8">Panel de Administración</h2>
-                    
-                    <div className="flex gap-6 mb-8 flex-wrap justify-center">
-                        {/* Card 1: Gestionar Videos */}
-                        <div 
-                            className="bg-white shadow-lg rounded-lg p-6 w-64 cursor-pointer hover:shadow-2xl transition-transform transform hover:translate-y-1"
-                            onClick={() => navigate('/VideoList')}
-                        >
-                            <h3 className="text-xl text-indigo-600 font-semibold mb-4">Gestionar Videos</h3>
-                            <p className="text-gray-600">Administra los videos disponibles para la plataforma.</p>
-                        </div>
+  return (
+    <div className="h-screen w-screen bg-black">
+      {/* Main container with padding-top */}
+      <div className="pt-20"> {/* Space for the Navbar */}
+        <div className="flex flex-col items-center justify-center h-full">
+          <div className="w-full max-w-4xl p-8 rounded-lg shadow-lg bg-gray-900 space-y-8">
+            {/* Title */}
+            <h2 className="text-4xl font-bold text-white text-center">Admin Dashboard</h2>
 
-                        {/* Card 2: Gestionar Usuarios */}
-                        <div 
-                            className="bg-white shadow-lg rounded-lg p-6 w-64 cursor-pointer hover:shadow-2xl transition-transform transform hover:translate-y-1"
-                            onClick={() => navigate('/UserRList')}
-                        >
-                            <h3 className="text-xl text-indigo-600 font-semibold mb-4">Gestionar Usuarios</h3>
-                            <p className="text-gray-600">Gestiona y supervisa a los usuarios registrados.</p>
-                        </div>
+            {/* Cards section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Card 1: Manage Videos */}
+              <div
+                className="bg-gray-800 shadow-lg rounded-lg p-6 cursor-pointer hover:bg-gray-700 transition-colors transform hover:scale-105"
+                onClick={() => navigate("/VideoList")}
+              >
+                <h3 className="text-xl text-red-500 font-semibold mb-4">Manage Videos</h3>
+                <p className="text-gray-400">Manage the videos available on the platform.</p>
+              </div>
 
-                     {/* Card 3: Gestionar Playlists */}
-                     <div 
-                                className="bg-white shadow-lg rounded-lg p-6 w-64 cursor-pointer hover:shadow-2xl transition-transform transform hover:translate-y-1"
-                                onClick={() => navigate('/PlaylistManager')}
-                            >
-                                <h3 className="text-xl text-indigo-600 font-semibold mb-4">Gestionar Playlists</h3>
-                                <p className="text-gray-600">Crea, edita y elimina playlists de la plataforma.</p>
-                            </div>
-                        </div>
+              {/* Card 2: Manage Users */}
+              <div
+                className="bg-gray-800 shadow-lg rounded-lg p-6 cursor-pointer hover:bg-gray-700 transition-colors transform hover:scale-105"
+                onClick={() => navigate("/UsersRList")}
+              >
+                <h3 className="text-xl text-red-500 font-semibold mb-4">Manage Users</h3>
+                <p className="text-gray-400">Manage and monitor registered users.</p>
+              </div>
 
-                        {/* Botón de Cerrar Sesión */}
-                        <button
-                            className="bg-red-500 text-white px-4 py-2 rounded w-full mt-4 hover:bg-red-600 transition-colors"
-                            onClick={handleLogout}
-                        >
-                            Cerrar Sesión
-                        </button>
-                    </div>
-                </div>
+              {/* Card 3: Manage Playlists */}
+              <div
+                className="bg-gray-800 shadow-lg rounded-lg p-6 cursor-pointer hover:bg-gray-700 transition-colors transform hover:scale-105"
+                onClick={() => navigate("/PlaylistManager")}
+              >
+                <h3 className="text-xl text-red-500 font-semibold mb-4">Manage Playlists</h3>
+                <p className="text-gray-400">Create, edit, and delete playlists on the platform.</p>
+              </div>
             </div>
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default AdminDashboard;

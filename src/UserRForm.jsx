@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 const UserRForm = () => {
+
+    const {id} = useParams();
+
     const [user, setUser] = useState({
         fullname: '',
         pin: '',
@@ -11,15 +14,15 @@ const UserRForm = () => {
     const [imagePreview, setImagePreview] = useState(null);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-    const { state } = useLocation(); // Para acceder al estado pasado desde UsersRList
+    const { state } = useLocation(); // To access the state passed from
 
     useEffect(() => {
         if (state?.user) {
-            console.log('Usuario cargado:', state.user); // Verifica que incluya el campo `id`
-            setUser(state.user); // Cargar los datos del usuario seleccionado
-            setImagePreview(state.user.avatar_url); // Mostrar la imagen previa
+            console.log('User loaded:', state.user); // Verify it includes the `id` field
+            setUser(state.user); // Load selected user data
+            setImagePreview(state.user.avatar_url); // Show the preview image
         } else {
-            navigate('/UserRList'); // Redirigir si no hay usuario en el estado
+            navigate('/UsersRList'); // Redirect if no user is in the state
         }
     }, [state, navigate]);
 
@@ -28,13 +31,13 @@ const UserRForm = () => {
         if (file) {
             const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
             if (!allowedTypes.includes(file.type)) {
-                setError('El archivo debe ser de tipo JPG, JPEG, PNG o GIF.');
+                setError('The file must be of type JPG, JPEG, PNG, or GIF.');
                 return;
             }
     
             const reader = new FileReader();
             reader.onloadend = () => {
-                setUser({ ...user, avatar: file }); // Asegúrate de que esto sea un archivo
+                setUser({ ...user, avatar: file }); // Ensure this is a file
                 setImagePreview(reader.result);
             };
             reader.readAsDataURL(file);
@@ -44,9 +47,9 @@ const UserRForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
     
-        // Validación básica en el frontend
+        // Basic frontend validation
         if (!user.fullname || !user.pin) {
-            setError('Todos los campos son obligatorios.');
+            setError('All fields are required.');
             return;
         }
     
@@ -58,96 +61,100 @@ const UserRForm = () => {
             formData.append('avatar', user.avatar);
         }
     
-        // Obtener el token de localStorage
+        // Get the token from localStorage
         const token = localStorage.getItem('auth_token');
         if (!token) {
-            setError('No estás autenticado. Por favor, inicia sesión.');
+            setError('You are not authenticated. Please log in.');
             return;
         }
     
         try {
-            console.log('Datos a enviar:', {
-                id: user.id,  // Incluye el id aquí
+            console.log('Data to send:', {
+                id: user.id,  // Include the id here
                 fullname: user.fullname,
                 pin: user.pin,
                 avatar: user.avatar,
             });
     
-            const response = await axios.put(
-                `http://localhost:8000/api/updateRestrictedUsers/${user.id}`, // Asegúrate de que el id esté en la URL
+            const response = await axios.post(
+                `http://localhost:8000/api/updateRestrictedUsers/${user.id}`, // Ensure the id is in the URL
                 formData,
                 {
                     headers: {
                         'Content-Type': 'multipart/form-data',
-                        Authorization: `Bearer ${token}`,  // Aquí se agrega el token al encabezado
+                        Authorization: `Bearer ${token}`,  // Add the token to the header
                     },
                 }
             );
     
-            console.log('Respuesta del servidor:', response.data);
+            console.log('Server response:', response.data);
     
-            if (response.data.success) {
-                console.log('Usuario actualizado:', response.data.user);
-                
-                // Actualiza el estado con los datos devueltos del servidor
+            if (response.data.message === "Restricted user successfully updated") {
+                console.log('User updated:', response.data.user);
+            
+                // Update state with the data returned from the server
                 setUser(response.data.user);
             
-                // Redirige a la lista de usuarios
-                navigate('/UserRList');
-            
-             
+                // Redirect to the user list
+                navigate('/UsersRList');
             } else {
-                setError(response.data.message || 'La actualización no se completó correctamente.');
+                setError(response.data.message || 'The update was not completed successfully.');
             }
+            
         } catch (error) {
-            console.error('Error al actualizar usuario:', error.response?.data || error.message);
-            setError(error.response?.data?.message || 'Hubo un error al actualizar el usuario.');
+            console.error('Error updating user:', error.response?.data || error.message);
+            setError(error.response?.data?.message || 'There was an error updating the user.');
         }
     };
     
-    
-    
-    
     return (
-        <div className="p-4">
-            {error && <p className="text-red-500">{error}</p>}
-            
-            <div className="mb-6 p-4 border border-gray-300 rounded-lg shadow-md bg-blue-950 text-white">
-                <h3 className="text-xl font-semibold mb-4">Editar Usuario</h3>
+        <div className="h-screen w-screen bg-black flex justify-center items-center">
+            {/* Main form container */}
+            <div className="w-full max-w-md p-6 bg-blue-950 rounded-lg shadow-md text-white">
+                {/* Error message */}
+                {error && <p className="text-red-500 mb-4">{error}</p>}
+    
+                {/* Form title */}
+                <h3 className="text-xl font-semibold mb-4 text-center">Edit User</h3>
+    
+                {/* Full name field */}
                 <input
                     type="text"
-                    placeholder="Nombre completo"
+                    placeholder="Full Name"
                     value={user.fullname}
                     onChange={(e) => setUser({ ...user, fullname: e.target.value })}
-                    className="mb-2 p-2 border border-gray-300 rounded w-full text-black"
+                    className="mb-4 p-2 border border-gray-700 rounded w-full bg-gray-800 text-white placeholder-gray-400"
                 />
+
+                {/* PIN field */}
                 <input
                     type="text"
                     placeholder="PIN"
                     value={user.pin}
                     onChange={(e) => setUser({ ...user, pin: e.target.value })}
-                    className="mb-2 p-2 border border-gray-300 rounded w-full text-black"
+                    className="mb-4 p-2 border border-gray-700 rounded w-full bg-gray-800 text-white placeholder-gray-400"
                 />
+
+                {/* Image field */}
                 <input
                     type="file"
                     onChange={handleImageChange}
-                    className="p-2 border border-gray-300 rounded w-full"
+                    className="mb-4 p-2 border border-gray-700 rounded w-full bg-gray-800 text-white placeholder-gray-400"
                 />
+
+                {/* Image preview */}
                 {imagePreview && (
-                    <div className="mt-4">
-                        <img
-                            src={imagePreview}
-                            alt="Vista previa"
-                            className="w-24 h-24 rounded-full"
-                        />
+                    <div className="flex justify-center mb-4">
+                        <img src={imagePreview} alt="Preview" className="w-24 h-24 rounded-full" />
                     </div>
                 )}
                 
+                {/* Save changes button */}
                 <button
                     onClick={handleSubmit}
-                    className="bg-blue-600 text-white p-2 rounded mt-4 hover:bg-blue-700"
+                    className="bg-blue-600 text-white py-2 px-4 rounded w-full hover:bg-blue-700 transition-colors"
                 >
-                    Guardar Cambios
+                    Save Changes
                 </button>
             </div>
         </div>

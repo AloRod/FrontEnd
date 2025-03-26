@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import PlaylistForm from './PlaylistForm';
-import VideoForm from './VideoForm';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import PlaylistForm from "./PlaylistForm";
+import VideoForm from "./VideoForm";
 
-const API_URL = 'http://localhost:8000/api';
+const API_URL = "http://localhost:8000/api";
 
 const VideoList = () => {
   const [playlists, setPlaylists] = useState([]);
@@ -14,7 +14,7 @@ const VideoList = () => {
   const [error, setError] = useState(null);
   const [authError, setAuthError] = useState(null);
 
-  const getToken = () => localStorage.getItem('auth_token');
+  const getToken = () => localStorage.getItem("auth_token");
 
   const getAuthHeaders = () => ({
     headers: { Authorization: `Bearer ${getToken()}` },
@@ -23,7 +23,7 @@ const VideoList = () => {
   useEffect(() => {
     const token = getToken();
     if (!token) {
-      setAuthError('No estás autenticado. Por favor inicia sesión.');
+      setAuthError("You are not authenticated. Please log in.");
       return;
     }
 
@@ -33,8 +33,8 @@ const VideoList = () => {
         setPlaylists(response.data);
       })
       .catch((error) => {
-        console.error('Error fetching playlists:', error);
-        setError('Hubo un error al cargar las playlists.');
+        console.error("Error fetching playlists:", error);
+        setError("There was an error loading the playlists.");
       });
   }, []);
 
@@ -47,16 +47,16 @@ const VideoList = () => {
         setVideos(response.data);
       })
       .catch((error) => {
-        console.error('Error fetching videos:', error);
-        setError('Hubo un error al cargar los videos.');
+        console.error("Error fetching videos:", error);
+        setError("There was an error loading the videos.");
       });
   };
 
   const handleDeleteVideo = (video) => {
-    if (window.confirm('¿Estás seguro de que deseas eliminar este video?')) {
-      const token = localStorage.getItem('auth_token');
+    if (window.confirm("Are you sure you want to delete this video?")) {
+      const token = localStorage.getItem("auth_token");
       if (!token) {
-        setError('No estás autenticado. Por favor, inicia sesión.');
+        setError("You are not authenticated. Please log in.");
         return;
       }
 
@@ -68,18 +68,18 @@ const VideoList = () => {
           setVideos((prevVideos) => prevVideos.filter((v) => v.id !== video.id));
         })
         .catch((error) => {
-          console.error('Error deleting video:', error);
-          setError(error.response?.data?.message || 'Hubo un error al eliminar el video.');
+          console.error("Error deleting video:", error);
+          setError(error.response?.data?.message || "There was an error deleting the video.");
         });
     }
   };
 
   const handleSaveVideo = (updatedVideo) => {
     if (!updatedVideo) {
-      // Si updatedVideo es null, significa que se eliminó el video
+      // If updatedVideo is null, it means the video was deleted
       setVideos((prevVideos) => prevVideos.filter((v) => v.id !== showVideoForm.video.id));
     } else {
-      // Si updatedVideo existe, actualiza el estado con el nuevo video
+      // If updatedVideo exists, update the state with the new video
       setVideos((prevVideos) =>
         prevVideos.map((v) => (v.id === updatedVideo.id ? updatedVideo : v))
       );
@@ -88,9 +88,10 @@ const VideoList = () => {
   };
 
   return (
-    <div className="p-6 flex flex-col md:flex-row gap-6 ">
-      <div className="w-full md:w-1/3 bg-white p-4 rounded-lg shadow-md ">
-        <h1 className="text-2xl font-bold mb-4 text-black">Mis Playlists</h1>
+    <div className="p-6 flex flex-col md:flex-row gap-6 bg-black h-screen w-screen text-white">
+      {/* Sidebar for Playlists */}
+      <div className="w-full md:w-1/4 bg-gray-900 p-4 rounded-lg shadow-md">
+        <h1 className="text-2xl font-bold mb-4">My Playlists</h1>
 
         {authError && <p className="text-red-500 mb-4">{authError}</p>}
         {error && <p className="text-red-500 mb-4">{error}</p>}
@@ -98,10 +99,10 @@ const VideoList = () => {
         <div className="mb-4 flex gap-2">
           {selectedPlaylist && !showVideoForm.visible && (
             <button
-              className="bg-green-600 text-white px-4 py-2 rounded"
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors"
               onClick={() => setShowVideoForm({ visible: true, video: null })}
             >
-              Agregar Video
+              Add Video
             </button>
           )}
         </div>
@@ -124,13 +125,13 @@ const VideoList = () => {
 
         <ul className="space-y-2">
           {playlists.length === 0 ? (
-            <p className="text-gray-500">No hay playlists disponibles.</p>
+            <p className="text-gray-400">No playlists available.</p>
           ) : (
             playlists.map((playlist) => (
               <li
                 key={playlist.id}
-                className={`cursor-pointer p-2 rounded-md font-bold text-black ${
-                  selectedPlaylist?.id === playlist.id ? 'bg-blue-200' : 'hover:bg-gray-200'
+                className={`cursor-pointer p-3 rounded-md font-semibold ${
+                  selectedPlaylist?.id === playlist.id ? "bg-blue-900" : "hover:bg-gray-800"
                 }`}
                 onClick={() => handleSelectPlaylist(playlist)}
               >
@@ -141,17 +142,18 @@ const VideoList = () => {
         </ul>
       </div>
 
-      <div className="w-full md:w-2/3 bg-white p-4 rounded-lg shadow-md">
+      {/* Main Content for Videos */}
+      <div className="w-full md:w-3/4 bg-gray-900 p-4 rounded-lg shadow-md">
         {selectedPlaylist ? (
           <>
-            <h2 className="text-xl font-bold mb-2 text-black">{selectedPlaylist.name}</h2>
-            <p className="text-gray-600 mb-4">Total de videos: {videos.length}</p>
+            <h2 className="text-xl font-bold mb-2">{selectedPlaylist.name}</h2>
+            <p className="text-gray-400 mb-4">Total videos: {videos.length}</p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {videos.length > 0 ? (
                 videos.map((video) => (
-                  <div key={video.id} className="p-2 border rounded-lg shadow-sm bg-gray-50">
-                    <h3 className="font-bold text-sm text-black">{video.name}</h3>
+                  <div key={video.id} className="p-4 border border-gray-800 rounded-lg bg-gray-800">
+                    <h3 className="font-bold text-sm mb-2">{video.name}</h3>
                     <iframe
                       width="100%"
                       height="150"
@@ -160,27 +162,27 @@ const VideoList = () => {
                       frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
-                      className="rounded-md"
+                      className="rounded-md mt-2"
                     ></iframe>
-                    <p className="text-xs text-gray-600">{video.description}</p>
+                    <p className="text-xs text-gray-400 mt-2">{video.description}</p>
                     <div className="flex gap-2 mt-2">
                       <button
-                        className="bg-yellow-500 text-white px-2 py-1 rounded"
+                        className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 transition-colors"
                         onClick={() => setShowVideoForm({ visible: true, video })}
                       >
-                        Editar
+                        Edit
                       </button>
                       <button
-                        className="bg-red-500 text-white px-2 py-1 rounded"
+                        className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition-colors"
                         onClick={() => handleDeleteVideo(video)}
                       >
-                        Eliminar
+                        Delete
                       </button>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="text-gray-500">Esta playlist no tiene videos aún.</p>
+                <p className="text-gray-400">This playlist has no videos yet.</p>
               )}
             </div>
 
@@ -194,7 +196,7 @@ const VideoList = () => {
             )}
           </>
         ) : (
-          <p className="text-gray-500 text-center">Selecciona una playlist para ver sus videos.</p>
+          <p className="text-gray-400 text-center">Select a playlist to view its videos.</p>
         )}
       </div>
     </div>
