@@ -80,14 +80,14 @@ const UsersRList = () => {
     };
 
     const handleEditUser = (user) => {
-        navigate(`/EditUserR/${user.id}`, { state: { user } });
+        navigate(`/UserRForm/${user.id}`, { state: { user } });
     };
 
     return (
-        <div className="h-screen w-screen flex flex-col justify-center items-center bg-black p-6">
+        <div className="p-6 flex flex-col md:flex-row gap-6 ">
             {error && <p className="text-red-500 mb-4">{error}</p>}
             {!isAdding && (
-                <button onClick={() => setIsAdding(true)} className="bg-green-600 text-white p-2 rounded mb-4 hover:bg-green-700">
+                <button onClick={() => setIsAdding(true)} className="bg-green-600 text-white p-1 rounded mb-1 hover:bg-green-700">
                     Agregar Nuevo Usuario
                 </button>
             )}

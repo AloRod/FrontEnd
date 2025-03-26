@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
-const EditUserR = () => {
+const UserRForm = () => {
     const [user, setUser] = useState({
         fullname: '',
         pin: '',
@@ -154,4 +154,4 @@ const EditUserR = () => {
     );
 };
 
-export default EditUserR;
+export default UserRForm;

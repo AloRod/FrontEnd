@@ -88,8 +88,8 @@ const VideoList = () => {
   };
 
   return (
-    <div className="p-6 flex flex-col md:flex-row gap-6">
-      <div className="w-full md:w-1/3 bg-white p-4 rounded-lg shadow-md">
+    <div className="p-6 flex flex-col md:flex-row gap-6 ">
+      <div className="w-full md:w-1/3 bg-white p-4 rounded-lg shadow-md ">
         <h1 className="text-2xl font-bold mb-4 text-black">Mis Playlists</h1>
 
         {authError && <p className="text-red-500 mb-4">{authError}</p>}
