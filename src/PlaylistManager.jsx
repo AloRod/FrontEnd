@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const API_URL = 'http://localhost:8000/api';
-
+//PRUEBA PARA SUBIR EL FRONT
 const PlaylistManager = () => {
   const [playlists, setPlaylists] = useState([]);
   const [name, setName] = useState('');
