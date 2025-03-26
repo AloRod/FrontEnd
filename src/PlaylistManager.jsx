@@ -59,7 +59,7 @@ const PlaylistManager = () => {
       })
       .catch((error) => {
         console.error('Error fetching restricted users:', error);
-        setError('There was an error loading restricted users.');
+        setError('There was an error loading the restricted users.');
       });
   }, []);
 
@@ -159,8 +159,118 @@ const PlaylistManager = () => {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4 text-black">Manage Playlists</h1>
+
       {error && <p className="text-red-500 mb-4">{error}</p>}
-      {/* The rest of the UI remains unchanged */}
+
+      {/* Form for Creating/Editing Playlists */}
+      <form onSubmit={(e) => { e.preventDefault(); handleCreateOrUpdatePlaylist(); }} className="mb-6">
+        <h2 className="text-lg font-bold mb-2 text-black">
+          {editingPlaylistId ? 'Edit Playlist' : 'Create New Playlist'}
+        </h2>
+        <div className="mb-2">
+          <label className="block text-sm font-medium text-gray-700">Playlist Name</label>
+          <input
+            type="text"
+            placeholder="Playlist name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            className="border p-2 w-full"
+          />
+        </div>
+        <div className="mb-2">
+          <label className="block text-sm font-medium text-gray-700">Description</label>
+          <textarea
+            placeholder="Description (optional)"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="border p-2 w-full"
+          />
+        </div>
+        <div className="mb-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Associated Restricted Users (Hold Ctrl/Cmd to select multiple)
+          </label>
+          <select
+            multiple
+            value={associatedProfiles}
+            onChange={(e) =>
+              setAssociatedProfiles(
+                Array.from(e.target.selectedOptions, (option) => option.value)
+              )
+            }
+            className="border p-2 w-full"
+          >
+            {restrictedUsers.map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.fullname} (ID: {user.id})
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex gap-2">
+          <button
+            type="submit"
+            disabled={loading}
+            className={`bg-indigo-600 text-white px-4 py-2 rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            {loading ? 'Processing...' : editingPlaylistId ? 'Update Playlist' : 'Create Playlist'}
+          </button>
+          {editingPlaylistId && (
+            <button
+              type="button"
+              onClick={() => {
+                setName('');
+                setDescription('');
+                setAssociatedProfiles([]);
+                setEditingPlaylistId(null);
+              }}
+              className="bg-gray-300 px-4 py-2 rounded"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
+      </form>
+
+      {/* List of Playlists */}
+      <div>
+        <h2 className="text-lg font-bold mb-2 text-black">Your Playlists</h2>
+        {playlists.length === 0 ? (
+          <p className="text-gray-500">No playlists available.</p>
+        ) : (
+          <ul className="space-y-2">
+            {playlists.map((playlist) => (
+              <li key={playlist.id} className="flex justify-between items-center p-2 border rounded-md bg-gray-50">
+                <div>
+                  <h3 className="font-bold text-black">{playlist.name}</h3>
+                  <p className="text-xs text-gray-600">{playlist.description}</p>
+                  <p className="text-xs text-gray-500">
+                    Associated Profiles:{' '}
+                    {Array.isArray(playlist.associated_profiles)
+                      ? playlist.associated_profiles.join(', ') || 'None'
+                      : 'None'}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    className="bg-yellow-500 text-white px-2 py-1 rounded"
+                    onClick={() => handleEditPlaylist(playlist)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="bg-red-500 text-white px-2 py-1 rounded"
+                    onClick={() => handleDeletePlaylist(playlist.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 };
