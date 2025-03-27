@@ -3,11 +3,12 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const HomeScreen = () => {
-  const [users, setUsers] = useState([]); // Ensures users is always an array
+  const [users, setUsers] = useState([]);
   const [adminPin, setAdminPin] = useState("");
   const [userPin, setUserPin] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [message, setMessage] = useState("");
+  const [playlists, setPlaylists] = useState([]); // Para almacenar las playlists
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -70,26 +71,32 @@ const HomeScreen = () => {
       setMessage("Please select a user.");
       return;
     }
-  
+
     try {
-      const token = localStorage.getItem("auth_token"); // Get the token from local storage
+      const token = localStorage.getItem("auth_token");
       if (!token) {
         setMessage("Not authenticated, please log in.");
         return;
       }
-  
+
       const response = await axios.post(
         `http://localhost:8000/api/validateUserPin/${selectedUser.id}`,
         { pin: userPin },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Include the token in the header
+            Authorization: `Bearer ${token}`,
           },
         }
       );
-  
+
       if (response.data.message === "Access granted to user") {
-        navigate("/UserDashboard");
+        // Obtener playlists del usuario
+        const playlistsResponse = await axios.get(
+          `http://localhost:8000/api/users/${selectedUser.id}/playlists`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setPlaylists(playlistsResponse.data); // Guardar las playlists en el estado // Guardar las playlists en el estado
+        navigate("/PlaylistList");
       } else {
         setMessage("Error validating PIN.");
       }
@@ -98,10 +105,9 @@ const HomeScreen = () => {
       console.error("Error validating restricted user PIN:", error.response?.data || error.message);
     }
   };
-
+ 
   return (
     <div className="h-screen w-screen bg-black flex flex-col items-center justify-center">
-      {/* Admin access button in the top right corner */}
       <div className="absolute top-4 right-4">
         <form onSubmit={handleAdminAccess} className="flex flex-col space-y-2">
           <input
@@ -121,10 +127,8 @@ const HomeScreen = () => {
         </form>
       </div>
 
-      {/* Error message */}
       {message && <div className="text-center text-red-500 mb-4">{message}</div>}
 
-      {/* User list */}
       <div className="flex flex-col items-center space-y-6">
         <h2 className="text-4xl font-bold text-white">Who is watching now?</h2>
         <div className="flex overflow-x-auto space-x-6 pb-4">
@@ -149,7 +153,6 @@ const HomeScreen = () => {
         </div>
       </div>
 
-      {/* Form for selected user access */}
       {selectedUser && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center">
           <form onSubmit={handleUserAccess} className="bg-gray-900 p-8 rounded-lg shadow-lg space-y-4">
@@ -179,6 +182,20 @@ const HomeScreen = () => {
               Cancel
             </button>
           </form>
+        </div>
+      )}
+
+      {/* Mostrar playlists si están disponibles */}
+      {playlists.length > 0 && (
+        <div className="text-white mt-8">
+          <h3 className="text-2xl font-bold">Playlists for {selectedUser?.fullname}</h3>
+          <ul className="space-y-4">
+            {playlists.map((playlist) => (
+              <li key={playlist.id} className="text-lg">
+                {playlist.name}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>

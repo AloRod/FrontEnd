@@ -7,6 +7,7 @@ import UsersRList from './UsersRList';
 import VideoList from './VideoList';
 import UserRForm from './UserRForm';
 import PlaylistManager from './PlaylistManager';
+import PlaylistList from './PlaylistList';
 import Navbar from './Navbar'; // Importa el Navbar
 
 // Componente para proteger rutas
@@ -94,6 +95,17 @@ function App() {
                             <>
                                 <Navbar />
                                 <PlaylistManager />
+                            </>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/PlaylistList"
+                    element={
+                        <ProtectedRoute>
+                            <>
+                                <Navbar />
+                                <PlaylistList />
                             </>
                         </ProtectedRoute>
                     }
