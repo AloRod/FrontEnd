@@ -55,8 +55,9 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
+                
                 <Route
-                    path="/UserRList"
+                    path="/UsersRList"
                     element={
                         <ProtectedRoute>
                             <>
@@ -66,17 +67,18 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
-                <Route
-                    path="/UserRForm"
-                    element={
-                        <ProtectedRoute>
-                            <>
-                                <Navbar />
-                                <UserRForm />
-                            </>
-                        </ProtectedRoute>
-                    }
-                />
+        
+        <Route
+    path="/UserRForm/:id"
+    element={
+        <ProtectedRoute>
+            <div>
+                <Navbar />
+                <UserRForm />
+            </div>
+        </ProtectedRoute>
+    }
+/>
                 <Route
                     path="/VideoList"
                     element={
@@ -110,7 +112,9 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
+                
             </Routes>
+            
         </Router>
     );
 }

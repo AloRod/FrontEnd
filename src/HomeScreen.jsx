@@ -79,8 +79,11 @@ const HomeScreen = () => {
         return;
       }
 
+      console.log("Validating PIN for user:", selectedUser.id); // Depuración
+      console.log("PIN entered:", userPin); // Depuración
+
       const response = await axios.post(
-        `http://localhost:8000/api/validateUserPin/${selectedUser.id}`,
+        `http://localhost:8000/api/validateRestrictedUserPin/${selectedUser.id}`,
         { pin: userPin },
         {
           headers: {
@@ -89,14 +92,13 @@ const HomeScreen = () => {
         }
       );
 
+      console.log("Backend response:", response.data); // Depuración
+
       if (response.data.message === "Access granted to user") {
-        // Obtener playlists del usuario
-        const playlistsResponse = await axios.get(
-          `http://localhost:8000/api/users/${selectedUser.id}/playlists`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setPlaylists(playlistsResponse.data); // Guardar las playlists en el estado // Guardar las playlists en el estado
-        navigate("/PlaylistList");
+        // Obtener las playlists desde la respuesta del backend
+        const playlists = response.data.playlists; // Guardar las playlists en el estado
+        setPlaylists(playlists); // Actualizar el estado con las playlists
+        navigate("/PlaylistUser", { state: { playlists } }); // Redirigir a la pantalla de playlists
       } else {
         setMessage("Error validating PIN.");
       }
@@ -104,7 +106,7 @@ const HomeScreen = () => {
       setMessage("Incorrect PIN.");
       console.error("Error validating restricted user PIN:", error.response?.data || error.message);
     }
-  };
+};
  
   return (
     <div className="h-screen w-screen bg-black flex flex-col items-center justify-center">

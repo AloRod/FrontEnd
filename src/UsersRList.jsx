@@ -79,9 +79,35 @@ const UsersRList = () => {
     }
   };
 
-  const handleEditUser = (user) => {
-    navigate(`/UserRForm/${user.id}`, { state: { user } });
-  };
+  const handleEditUser = async (userId) => {
+    try {
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+            alert('You are not authenticated. Please log in.');
+            return;
+        }
+
+        const response = await axios.get(`http://localhost:8000/api/restrictedUsers/${userId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        // Asegúrate de que la respuesta contenga los datos del usuario
+        const userData = response.data.user || response.data;
+
+        console.log('Navigating with user data:', userData); // Depuración
+
+        if (!userData) {
+            throw new Error('User data is missing from the server response.');
+        }
+
+        navigate(`/UserRForm/${userData.id}`, { state: { user: userData } });
+    } catch (error) {
+        console.error('Error fetching user data:', error.response?.data || error.message);
+        alert('There was an error loading the user data.');
+    }
+};
 
   return (
     <div className="p-6 flex flex-col items-center bg-black h-screen w-screen text-white">
@@ -142,7 +168,7 @@ const UsersRList = () => {
             <p className="text-xs text-gray-400">PIN: {user.pin}</p>
             <div className="flex space-x-2 mt-2 w-full">
               <button
-                onClick={() => handleEditUser(user)}
+                onClick={() => handleEditUser(user.id)}
                 className="bg-yellow-500 text-xs px-2 py-1 rounded hover:bg-yellow-600 transition-colors w-full"
               >
                 Edit
