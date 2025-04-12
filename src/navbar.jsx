@@ -40,27 +40,10 @@ const Navbar = () => {
               className="block px-4 py-2 hover:bg-blue-800 rounded"
               onClick={() => setIsMenuOpen(false)} // Cierra el menú al hacer clic
             >
-              Inicio
+             Home screen
             </Link>
           </li>
-          <li>
-            <Link
-              to="/AdminDashboard"
-              className="block px-4 py-2 hover:bg-blue-800 rounded"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Administrador
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/UserDashboard"
-              className="block px-4 py-2 hover:bg-blue-800 rounded"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Usuario
-            </Link>
-          </li>
+         
         </ul>
 
         {/* Botón de Cerrar sesión */}
@@ -69,7 +52,7 @@ const Navbar = () => {
             onClick={handleLogout}
             className="w-full bg-red-600 px-4 py-2 rounded hover:bg-red-700"
           >
-            Cerrar sesión
+            log out
           </button>
         </div>
       </div>
