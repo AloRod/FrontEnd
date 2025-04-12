@@ -2,29 +2,27 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const API_URL = 'http://localhost:8000/api';
-// TEST FOR UPLOADING THE FRONTEND
+
 const PlaylistManager = () => {
   const [playlists, setPlaylists] = useState([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [editingPlaylistId, setEditingPlaylistId] = useState(null);
-  const [associatedProfiles, setAssociatedProfiles] = useState([]); // Array of associated profile IDs
-  const [restrictedUsers, setRestrictedUsers] = useState([]); // List of restricted users
+  const [associatedProfiles, setAssociatedProfiles] = useState([]);
+  const [restrictedUsers, setRestrictedUsers] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Get token and user_id from localStorage
   const getToken = () => localStorage.getItem('auth_token');
   const getUserId = () => {
-    const userId = localStorage.getItem('user_id'); // Read user_id from localStorage
-    return userId ? parseInt(userId, 10) : null; // Convert to number
+    const userId = localStorage.getItem('user_id');
+    return userId ? parseInt(userId, 10) : null;
   };
 
   const getAuthHeaders = () => ({
     headers: { Authorization: `Bearer ${getToken()}` },
   });
 
-  // Fetch playlists
   useEffect(() => {
     const token = getToken();
     if (!token) {
@@ -35,7 +33,6 @@ const PlaylistManager = () => {
     axios
       .get(`${API_URL}/playlists`, getAuthHeaders())
       .then((response) => {
-        // Convert associated_profiles from JSON strings to arrays
         const playlistsWithParsedProfiles = response.data.map((playlist) => ({
           ...playlist,
           associated_profiles: playlist.associated_profiles
@@ -50,12 +47,11 @@ const PlaylistManager = () => {
       });
   }, []);
 
-  // Fetch restricted users
   useEffect(() => {
     axios
       .get(`${API_URL}/restrictedUsers`, getAuthHeaders())
       .then((response) => {
-        setRestrictedUsers(response.data); // Store the list of restricted users
+        setRestrictedUsers(response.data);
       })
       .catch((error) => {
         console.error('Error fetching restricted users:', error);
@@ -72,13 +68,12 @@ const PlaylistManager = () => {
     setLoading(true);
 
     try {
-      const userId = getUserId(); // Get user_id from localStorage
+      const userId = getUserId();
 
       if (!userId || isNaN(userId)) {
         throw new Error('Could not retrieve user ID or it is invalid.');
       }
 
-      // Validate and convert associated_profiles to numbers
       const profiles = Array.isArray(associatedProfiles)
         ? associatedProfiles.map(Number).filter((id) => !isNaN(id))
         : [];
@@ -86,32 +81,28 @@ const PlaylistManager = () => {
       const data = {
         name,
         description,
-        user_id: userId, // Use user_id from localStorage
-        admin_id: userId, // Send the same user_id as admin_id
-        associated_profiles: profiles, // Send as an empty array if no associated profiles
+        user_id: userId,
+        admin_id: userId,
+        associated_profiles: profiles,
       };
 
       let response;
       if (editingPlaylistId) {
-        // Edit existing playlist
         response = await axios.put(
           `${API_URL}/playlists/${editingPlaylistId}`,
           data,
           getAuthHeaders()
         );
       } else {
-        // Create new playlist
         response = await axios.post(`${API_URL}/playlists`, data, getAuthHeaders());
       }
 
-      // Update playlist list
       setPlaylists(
         editingPlaylistId
           ? playlists.map((p) => (p.id === editingPlaylistId ? response.data : p))
           : [...playlists, response.data]
       );
 
-      // Clear the form
       setName('');
       setDescription('');
       setAssociatedProfiles([]);
@@ -119,14 +110,7 @@ const PlaylistManager = () => {
       setError(null);
     } catch (error) {
       console.error('Error saving playlist:', error);
-
-      // Display specific backend errors if available
-      if (error.response && error.response.data && error.response.data.errors) {
-        const errors = Object.values(error.response.data.errors).flat();
-        setError(errors.join(', '));
-      } else {
-        setError(error.message || 'There was an error saving the playlist.');
-      }
+      setError(error.response?.data?.message || 'There was an error saving the playlist.');
     } finally {
       setLoading(false);
     }
@@ -152,43 +136,49 @@ const PlaylistManager = () => {
   const handleEditPlaylist = (playlist) => {
     setName(playlist.name);
     setDescription(playlist.description);
-    setAssociatedProfiles(playlist.associated_profiles || []); // Load associated profiles
+    setAssociatedProfiles(playlist.associated_profiles || []);
     setEditingPlaylistId(playlist.id);
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4 text-black">Manage Playlists</h1>
+    <div className="bg-black text-white min-h-screen p-6 font-sans">
+      <h1 className="text-3xl font-bold mb-6">Manage Playlists</h1>
 
       {error && <p className="text-red-500 mb-4">{error}</p>}
 
       {/* Form for Creating/Editing Playlists */}
-      <form onSubmit={(e) => { e.preventDefault(); handleCreateOrUpdatePlaylist(); }} className="mb-6">
-        <h2 className="text-lg font-bold mb-2 text-black">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleCreateOrUpdatePlaylist();
+        }}
+        className="mb-8 bg-gray-900 p-6 rounded-lg shadow-lg"
+      >
+        <h2 className="text-xl font-bold mb-4">
           {editingPlaylistId ? 'Edit Playlist' : 'Create New Playlist'}
         </h2>
-        <div className="mb-2">
-          <label className="block text-sm font-medium text-gray-700">Playlist Name</label>
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">Playlist Name</label>
           <input
             type="text"
             placeholder="Playlist name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className="border p-2 w-full"
+            className="w-full p-2 bg-gray-800 border border-gray-700 rounded focus:outline-none focus:border-red-500 text-white"
           />
         </div>
-        <div className="mb-2">
-          <label className="block text-sm font-medium text-gray-700">Description</label>
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">Description</label>
           <textarea
             placeholder="Description (optional)"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="border p-2 w-full"
+            className="w-full p-2 bg-gray-800 border border-gray-700 rounded focus:outline-none focus:border-red-500 text-white"
           />
         </div>
-        <div className="mb-2">
-          <label className="block text-sm font-medium text-gray-700">
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">
             Associated Restricted Users (Hold Ctrl/Cmd to select multiple)
           </label>
           <select
@@ -199,7 +189,7 @@ const PlaylistManager = () => {
                 Array.from(e.target.selectedOptions, (option) => option.value)
               )
             }
-            className="border p-2 w-full"
+            className="w-full p-2 bg-gray-800 border border-gray-700 rounded focus:outline-none focus:border-red-500 text-white"
           >
             {restrictedUsers.map((user) => (
               <option key={user.id} value={user.id}>
@@ -212,7 +202,9 @@ const PlaylistManager = () => {
           <button
             type="submit"
             disabled={loading}
-            className={`bg-indigo-600 text-white px-4 py-2 rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`bg-red-600 text-white px-4 py-2 rounded transition duration-300 ${
+              loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-700'
+            }`}
           >
             {loading ? 'Processing...' : editingPlaylistId ? 'Update Playlist' : 'Create Playlist'}
           </button>
@@ -225,7 +217,7 @@ const PlaylistManager = () => {
                 setAssociatedProfiles([]);
                 setEditingPlaylistId(null);
               }}
-              className="bg-gray-300 px-4 py-2 rounded"
+              className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-300"
             >
               Cancel
             </button>
@@ -235,32 +227,33 @@ const PlaylistManager = () => {
 
       {/* List of Playlists */}
       <div>
-        <h2 className="text-lg font-bold mb-2 text-black">Your Playlists</h2>
+        <h2 className="text-2xl font-bold mb-4">Your Playlists</h2>
         {playlists.length === 0 ? (
-          <p className="text-gray-500">No playlists available.</p>
+          <p className="text-gray-400">No playlists available.</p>
         ) : (
-          <ul className="space-y-2">
+          <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {playlists.map((playlist) => (
-              <li key={playlist.id} className="flex justify-between items-center p-2 border rounded-md bg-gray-50">
-                <div>
-                  <h3 className="font-bold text-black">{playlist.name}</h3>
-                  <p className="text-xs text-gray-600">{playlist.description}</p>
-                  <p className="text-xs text-gray-500">
-                    Associated Profiles:{' '}
-                    {Array.isArray(playlist.associated_profiles)
-                      ? playlist.associated_profiles.join(', ') || 'None'
-                      : 'None'}
-                  </p>
-                </div>
-                <div className="flex gap-2">
+              <li
+                key={playlist.id}
+                className="bg-gray-900 p-4 rounded-lg shadow-lg hover:shadow-red-500/50 transition-shadow duration-300"
+              >
+                <h3 className="text-lg font-bold mb-2">{playlist.name}</h3>
+                <p className="text-sm text-gray-400 mb-2">{playlist.description}</p>
+                <p className="text-xs text-gray-400">
+                  Associated Profiles:{' '}
+                  {Array.isArray(playlist.associated_profiles)
+                    ? playlist.associated_profiles.join(', ') || 'None'
+                    : 'None'}
+                </p>
+                <div className="flex gap-2 mt-4">
                   <button
-                    className="bg-yellow-500 text-white px-2 py-1 rounded"
+                    className="bg-yellow-500 text-black px-2 py-1 rounded hover:bg-yellow-600 transition duration-300"
                     onClick={() => handleEditPlaylist(playlist)}
                   >
                     Edit
                   </button>
                   <button
-                    className="bg-red-500 text-white px-2 py-1 rounded"
+                    className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition duration-300"
                     onClick={() => handleDeletePlaylist(playlist.id)}
                   >
                     Delete

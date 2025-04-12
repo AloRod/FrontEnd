@@ -9,6 +9,7 @@ import UserRForm from './UserRForm';
 import PlaylistManager from './PlaylistManager';
 import PlaylistList from './PlaylistList';
 import Navbar from './Navbar'; // Importa el Navbar
+import PlaylistDetail from './PlaylistDetail';
 
 // Componente para proteger rutas
 const ProtectedRoute = ({ children }) => {
@@ -100,7 +101,7 @@ function App() {
                     }
                 />
                 <Route
-                    path="/PlaylistList"
+                    path="/PlaylistList/:userId"
                     element={
                         <ProtectedRoute>
                             <>
@@ -108,6 +109,17 @@ function App() {
                                 <PlaylistList />
                             </>
                         </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/playlist/:playlistId"
+                    element={
+                    <ProtectedRoute>
+                        <>
+                        <Navbar />
+                        <PlaylistDetail />
+                        </>
+                    </ProtectedRoute>
                     }
                 />
             </Routes>

@@ -80,7 +80,7 @@ const HomeScreen = () => {
       }
 
       const response = await axios.post(
-        `http://localhost:8000/api/validateUserPin/${selectedUser.id}`,
+        `http://localhost:8000/api/validateRestrictedUserPin/${selectedUser.id}`,
         { pin: userPin },
         {
           headers: {
@@ -89,14 +89,11 @@ const HomeScreen = () => {
         }
       );
 
-      if (response.data.message === "Access granted to user") {
+      
+      if (response.status === 200) {
+
         // Obtener playlists del usuario
-        const playlistsResponse = await axios.get(
-          `http://localhost:8000/api/users/${selectedUser.id}/playlists`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setPlaylists(playlistsResponse.data); // Guardar las playlists en el estado // Guardar las playlists en el estado
-        navigate("/PlaylistList");
+        navigate(`/PlaylistList/${selectedUser.id}`);
       } else {
         setMessage("Error validating PIN.");
       }
