@@ -181,7 +181,6 @@ export default function CompleteProfile() {
                             className="border p-2 w-full bg-gray-700 text-white rounded"
                         />
                     </div>
-
                     <button
                         type="submit"
                         className="bg-blue-500 hover:bg-blue-600 text-white p-2 w-full rounded mt-4"
