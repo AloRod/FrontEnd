@@ -1,5 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from 'react-router-dom';
+
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -14,6 +16,8 @@ export default function RegisterForm() {
     birthdate: ""
   });
   const [errors, setErrors] = useState({});
+
+  const navigate = useNavigate(); 
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -49,8 +53,10 @@ export default function RegisterForm() {
 
     try {
       const response = await axios.post("http://localhost:8000/api/register", formData);
-      alert("Registration successful");
-      console.log(response.data);
+      if(response.status === 201){
+        alert("Registration success, please check your email to activate your account.");
+        navigate('/');
+      }
     } catch (error) {
       setErrors(error.response?.data?.errors || {});
     }
@@ -84,6 +90,7 @@ export default function RegisterForm() {
           <select name="country" onChange={handleChange} 
             className="border p-2 w-full bg-gray-700 text-white rounded">
             <option value="">Select a country</option>
+            <option value="CR">Costa Rica</option>
             <option value="USA">United States</option>
             <option value="Mexico">Mexico</option>
             <option value="Canada">Canada</option>

@@ -10,6 +10,8 @@ import PlaylistManager from './PlaylistManager';
 import PlaylistList from './PlaylistList';
 import Navbar from './Navbar'; // Importa el Navbar
 import PlaylistDetail from './PlaylistDetail';
+import EmailVerificationPage from './screens/EmailVerificationPage';
+import CompleteProfile from './screens/CompleteProfile';
 
 // Componente para proteger rutas
 const ProtectedRoute = ({ children }) => {
@@ -32,6 +34,10 @@ function App() {
 
                 {/* Página de registro */}
                 <Route path="/register" element={<Register />} />
+
+                <Route path="/verify-email" element={<EmailVerificationPage />} />
+
+                <Route path="/complete-profile" element={<CompleteProfile />} />
 
                 {/* Rutas protegidas */}
                 <Route
@@ -57,7 +63,7 @@ function App() {
                     }
                 />
                 <Route
-                    path="/UserRList"
+                    path="/UsersRList"
                     element={
                         <ProtectedRoute>
                             <>
@@ -122,6 +128,7 @@ function App() {
                     </ProtectedRoute>
                     }
                 />
+
             </Routes>
         </Router>
     );
