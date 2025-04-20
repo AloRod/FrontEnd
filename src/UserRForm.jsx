@@ -33,7 +33,7 @@ const UserRForm = () => {
                         return;
                     }
 
-                    const response = await axios.get(`http://localhost:8000/api/restricted-users/${id}`, {
+                    const response = await axios.get(`http://localhost:8000/api//restrictedUsers/${id}`, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },

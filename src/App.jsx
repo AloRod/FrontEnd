@@ -13,6 +13,7 @@ import PlaylistDetail from './PlaylistDetail';
 import EmailVerificationPage from './screens/EmailVerificationPage';
 import CompleteProfile from './screens/CompleteProfile';
 
+
 // Componente para proteger rutas
 const ProtectedRoute = ({ children }) => {
     const token = localStorage.getItem('auth_token');
