@@ -3,11 +3,14 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google'; //abre la ventanita de google
 import { jwtDecode } from 'jwt-decode'; //decodificar
-
+import SmsVerificationDialog from './components/SmsVerificationDialog';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [showVerification, setShowVerification] = useState(false);
+  const [userData, setUserData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -19,17 +22,37 @@ const Login = () => {
         password,
       });
 
-      // Guardar el token y el userId en localStorage
-      localStorage.setItem('auth_token', response.data.token);
-      localStorage.setItem('user_id', response.data.user.id); // Asumiendo que la respuesta tiene el id del usuario
+      if (response.status == 200) {
+        setUserData(response.data);
 
-      setMessage(<p className="text-green-500">{response.data.message}</p>);
-      navigate('/HomeScreen'); // Redirigir a la pantalla de inicio
+        if (response.data.requires_verification) {
+          setShowVerification(true);
+          setMessage('');
+        } else {
+          // Guardar el token y el userId en localStorage
+          saveSession();
+        }
+      }
     } catch (error) {
       const errorMessage = error.response?.data?.error || 'There was a problem logging in.';
       setMessage(<p className="text-red-500">{errorMessage}</p>);
     }
   };
+
+  const saveSession = () => {
+    localStorage.setItem('auth_token', userData.token);
+    localStorage.setItem('user_id', userData.user.id);
+
+    setMessage(<p className="text-green-500">{userData.message}</p>);
+    navigate('/HomeScreen');
+  }
+
+  const handleVerificationCancel = () => {
+    setShowVerification(false);
+    setPendingUserId(null);
+    setMessage(<p className="text-yellow-500">Authentication cancelled. Please try again.</p>);
+  };
+
 
   const handleGoogleLoginSuccess = async (credentialResponse) => {
     try {
@@ -125,6 +148,14 @@ const Login = () => {
           <p className="text-gray-600">Don't have an account? <a href="/Register" className="text-blue-600 font-semibold hover:underline">Register here</a></p>
         </div>
       </div>
+      {/* SMS Verification Dialog */}
+      {showVerification && (
+          <SmsVerificationDialog
+            data={userData}
+            onSuccess={saveSession}
+            onCancel={handleVerificationCancel}
+          />
+        )}
     </div>
     </GoogleOAuthProvider>
   );
