@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import GraphQLClient from './utils/GraphQLClient';
 
 const API_URL = 'http://localhost:8000/api';
 
@@ -24,40 +25,49 @@ const PlaylistManager = () => {
   });
 
   useEffect(() => {
-    const token = getToken();
-    if (!token) {
-      setError('You are not authenticated. Please log in.');
-      return;
+    fetchPlaylistsAndUsers();
+  }, []);
+
+  const fetchPlaylistsAndUsers = async () => {
+    try {
+      setLoading(true);
+      const query = `
+        {
+          myRestrictedUsers {
+            id
+            fullname
+            avatar
+            pin
+            user_id
+          }
+          profilePlaylists {
+            id
+            name
+            admin_id
+            profiles {
+              fullname
+            }
+          }
+        }
+      `;
+
+      const data = await GraphQLClient.query(query);
+      
+      if (data && data.profilePlaylists) {
+        setPlaylists(data.profilePlaylists);
+      }
+      
+      if (data && data.myRestrictedUsers) {
+        setRestrictedUsers(data.myRestrictedUsers);
+      }
+      setError(null);
+    } catch (error) {
+      console.error('Error fetching playlists:', error);
+      setError('There was an error loading the playlists.');
+    } finally {
+      setLoading(false);
     }
-
-    axios
-      .get(`${API_URL}/playlists`, getAuthHeaders())
-      .then((response) => {
-        const playlistsWithParsedProfiles = response.data.map((playlist) => ({
-          ...playlist,
-          associated_profiles: playlist.associated_profiles
-            ? JSON.parse(playlist.associated_profiles)
-            : [],
-        }));
-        setPlaylists(playlistsWithParsedProfiles);
-      })
-      .catch((error) => {
-        console.error('Error fetching playlists:', error);
-        setError('There was an error loading the playlists.');
-      });
-  }, []);
-
-  useEffect(() => {
-    axios
-      .get(`${API_URL}/restrictedUsers`, getAuthHeaders())
-      .then((response) => {
-        setRestrictedUsers(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching restricted users:', error);
-        setError('There was an error loading the restricted users.');
-      });
-  }, []);
+  };
 
   const handleCreateOrUpdatePlaylist = async () => {
     if (!name.trim()) {
@@ -97,17 +107,18 @@ const PlaylistManager = () => {
         response = await axios.post(`${API_URL}/playlists`, data, getAuthHeaders());
       }
 
-      setPlaylists(
+      /*setPlaylists(
         editingPlaylistId
           ? playlists.map((p) => (p.id === editingPlaylistId ? response.data : p))
           : [...playlists, response.data]
-      );
+      );*/
 
       setName('');
       setDescription('');
       setAssociatedProfiles([]);
       setEditingPlaylistId(null);
       setError(null);
+      fetchPlaylistsAndUsers();
     } catch (error) {
       console.error('Error saving playlist:', error);
       setError(error.response?.data?.message || 'There was an error saving the playlist.');
@@ -241,8 +252,8 @@ const PlaylistManager = () => {
                 <p className="text-sm text-gray-400 mb-2">{playlist.description}</p>
                 <p className="text-xs text-gray-400">
                   Associated Profiles:{' '}
-                  {Array.isArray(playlist.associated_profiles)
-                    ? playlist.associated_profiles.join(', ') || 'None'
+                  {playlist.profiles && playlist.profiles.length > 0
+                    ? playlist.profiles.map((profile) => profile.fullname).join(', ') || 'None'
                     : 'None'}
                 </p>
                 <div className="flex gap-2 mt-4">

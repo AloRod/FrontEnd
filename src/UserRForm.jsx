@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
-
+import GraphQLClient from './utils/GraphQLClient';
 const UserRForm = () => {
     const { id } = useParams(); // Obtiene el ID del usuario de la URL
     const { state } = useLocation(); // Obtiene el estado pasado durante la navegación
@@ -25,28 +25,29 @@ const UserRForm = () => {
                 if (state?.user) {
                     userData = state.user;
                 } else {
-                    // Si el estado no está disponible, carga los datos del backend usando el ID
-                    const token = localStorage.getItem('auth_token');
-                    if (!token) {
-                        setError('You are not authenticated. Please log in.');
-                        navigate('/login');
-                        return;
+                    const query = `
+                    query GetRestrictedUser($id: ID) {
+                        myRestrictedUsers(id: $id) {
+                            id
+                            fullname
+                            pin
+                            avatar
+                            avatar_url
+                        }
                     }
+                `;
 
-                    const response = await axios.get(`http://localhost:8000/api//restrictedUsers/${id}`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
+                    const variables = { id };
+                    const result = await GraphQLClient.query(query, variables);
 
-                    userData = response.data.user || response.data; // Maneja diferentes estructuras de respuesta
+                    userData = result.myRestrictedUsers[0];
+
+                    if (!userData) {
+                        throw new Error('User not found');
+                    }
                 }
 
-                console.log('Loaded user data:', userData); // Depuración
-
-                if (!userData) {
-                    throw new Error('User data is missing.');
-                }
+                console.log('Loaded user data:', userData);
 
                 setUser({
                     id: userData.id,
@@ -65,6 +66,7 @@ const UserRForm = () => {
 
         fetchUserData();
     }, [id, state, navigate]);
+
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];

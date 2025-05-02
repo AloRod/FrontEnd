@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import PlaylistForm from "./PlaylistForm";
 import VideoForm from "./VideoForm";
+import GraphQLClient from './utils/GraphQLClient';
 
 const API_URL = "http://localhost:8000/api";
 
@@ -26,29 +27,59 @@ const VideoList = () => {
       return;
     }
 
-    axios
-      .get(`${API_URL}/playlists`, getAuthHeaders())
-      .then((response) => {
-        setPlaylists(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching playlists:", error);
-        setError("Hubo un error al cargar las listas de reproducción.");
-      });
+    fetchPlaylist();
   }, []);
 
-  const handleSelectPlaylist = (playlist) => {
+  const fetchPlaylist = async () => {
+    try {
+      const query = `
+      {
+        profilePlaylists {
+          id
+          name
+        }
+      }
+      `;
+
+      const data = await GraphQLClient.query(query);
+
+      if (data && data.profilePlaylists) {
+        setPlaylists(data.profilePlaylists);
+      } else {
+        console.error("No playlist found in the response");
+      }
+    } catch (error) {
+      console.error("Error fetching playlist:", error);
+      setError("Error loading playlist. Please try again later.");
+    }
+  };
+
+  const handleSelectPlaylist = async (playlist) => {
     setSelectedPlaylist(playlist);
 
-    axios
-      .get(`${API_URL}/playlists/${playlist.id}/videos`, getAuthHeaders())
-      .then((response) => {
-        setVideos(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching videos:", error);
-        setError("Hubo un error al cargar los videos.");
-      });
+    try {
+      const query = `
+        {
+          playlistVideos(playlistId: "${playlist.id}") {
+            id
+            name
+            url
+            description
+          }
+        }
+        `;
+
+      const data = await GraphQLClient.query(query);
+
+      if (data && data.playlistVideos) {
+        setVideos(data.playlistVideos);
+      } else {
+        console.error("No videos found in the response");
+      }
+    } catch (error) {
+      console.error("Error fetching videos:", error);
+      setError("Error loading videos. Please try again later.");
+    }
   };
 
   const handleDeleteVideo = (video) => {
@@ -187,12 +218,7 @@ const VideoList = () => {
             <p className="text-gray-400 text-center mb-4">
               Selecciona una lista para ver sus videos o crea una nueva lista.
             </p>
-            <button
-              className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-colors"
-              onClick={() => console.log(true)}
-            >
-              Crear Nueva Lista
-            </button>
+           
           </div>
         )}
       </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import GraphQLClient from './utils/GraphQLClient';
 
 const HomeScreen = () => {
   const [users, setUsers] = useState([]);
@@ -9,35 +10,40 @@ const HomeScreen = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [message, setMessage] = useState("");
   const [playlists, setPlaylists] = useState([]); // Para almacenar las playlists
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const token = localStorage.getItem("auth_token");
-        if (!token) {
-          console.error("No authentication token, please log in.");
-          return;
-        }
-
-        const response = await axios.get("http://localhost:8000/api/user", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (Array.isArray(response.data)) {
-          setUsers(response.data);
-        } else if (Array.isArray(response.data.restricted_users)) {
-          setUsers(response.data.restricted_users);
-        } else {
-          console.error("API response does not contain an array of users.");
-        }
-      } catch (error) {
-        console.error("Error fetching users:", error.response?.data || error);
-      }
-    };
-
-    fetchUsers();
+    fetchRestrictedUsers();
   }, []);
+
+  const fetchRestrictedUsers = async () => {
+    try {
+      setLoading(true);
+      const query = `
+{
+  myRestrictedUsers {
+    id
+    fullname
+    avatar_url
+  }
+}
+      `;
+
+      const data = await GraphQLClient.query(query);
+      
+      if (data && data.myRestrictedUsers) {
+        setUsers(data.myRestrictedUsers);
+      } else {
+        console.error("No restricted users found in the response");
+      }
+    } catch (error) {
+      console.error("Error fetching restricted users:", error);
+      setMessage("Error loading users. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAdminAccess = async (e) => {
     e.preventDefault();
@@ -129,7 +135,9 @@ const HomeScreen = () => {
       <div className="flex flex-col items-center space-y-6">
         <h2 className="text-4xl font-bold text-white">Who is watching now?</h2>
         <div className="flex overflow-x-auto space-x-6 pb-4">
-          {users.length > 0 ? (
+          {loading ? (
+            <p className="text-white">Loading users...</p>
+          ) : users.length > 0 ? (
             users.map((user) => (
               <div
                 key={user.id}
@@ -145,11 +153,11 @@ const HomeScreen = () => {
               </div>
             ))
           ) : (
-            <p className="text-white">Loading users...</p>
+            <p className="text-white">No users found.</p>
           )}
         </div>
       </div>
-
+      
       {selectedUser && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center">
           <form onSubmit={handleUserAccess} className="bg-gray-900 p-8 rounded-lg shadow-lg space-y-4">

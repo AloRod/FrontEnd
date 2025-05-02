@@ -12,6 +12,7 @@ import Navbar from './Navbar'; // Importa el Navbar
 import PlaylistDetail from './PlaylistDetail';
 import EmailVerificationPage from './screens/EmailVerificationPage';
 import CompleteProfile from './screens/CompleteProfile';
+import RestrictedUserHome from './screens/RestrictedUserHome';
 
 
 // Componente para proteger rutas
@@ -76,7 +77,7 @@ function App() {
                     }
                 />
                 <Route
-                    path="/UserRForm"
+                    path="/UserRForm/:id"
                     element={
                         <ProtectedRoute>
                             <>
@@ -114,7 +115,7 @@ function App() {
                         <ProtectedRoute>
                             <>
                                 <Navbar />
-                                <PlaylistList />
+                                <RestrictedUserHome />
                             </>
                         </ProtectedRoute>
                     }

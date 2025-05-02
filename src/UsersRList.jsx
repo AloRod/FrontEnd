@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import GraphQLClient from './utils/GraphQLClient';
 
 const UsersRList = () => {
   const [users, setUsers] = useState([]);
@@ -11,20 +12,32 @@ const UsersRList = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const token = localStorage.getItem("auth_token");
-        const response = await axios.get("http://localhost:8000/api/restrictedUsers", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUsers(response.data);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-        setError("There was an error loading the user list.");
-      }
-    };
+   
     fetchUsers();
   }, []);
+  
+  const fetchUsers = async () => {
+
+    const query = `
+    {
+      myRestrictedUsers {
+        id
+        fullname
+        avatar_url
+        pin
+      }
+    }
+    `;
+
+    const data = await GraphQLClient.query(query);
+
+    if (data && data.myRestrictedUsers) {
+      setUsers(data.myRestrictedUsers);
+    } else {
+      console.error("No restricted users found in the response");
+      setError("There was an error loading the user list.");
+    }
+  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -59,10 +72,7 @@ const UsersRList = () => {
       setImagePreview(null);
       setError(null);
 
-      const response = await axios.get("http://localhost:8000/api/restrictedUsers", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
-      });
-      setUsers(response.data);
+      fetchUsers();
     } catch (error) {
       setError("There was an error adding the user.");
     }
@@ -79,7 +89,7 @@ const UsersRList = () => {
     }
   };
 
-  const handleEditUser = async (userId) => {
+  const handleEditUser = async (index) => {
     try {
         const token = localStorage.getItem('auth_token');
         if (!token) {
@@ -87,7 +97,7 @@ const UsersRList = () => {
             return;
         }
 
-        const response = await axios.get(`http://localhost:8000/api/restrictedUsers/${userId}`, {
+       /* const response = await axios.get(`http://localhost:8000/api/restrictedUsers/${index}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -97,12 +107,12 @@ const UsersRList = () => {
         const userData = response.data.user || response.data;
 
         console.log('Navigating with user data:', userData); // Depuración
-
         if (!userData) {
             throw new Error('User data is missing from the server response.');
         }
+*/
 
-        navigate(`/UserRForm/${userData.id}`, { state: { user: userData } });
+        navigate(`/UserRForm/${users[index].id }`, { state: { user: users[index] } });
     } catch (error) {
         console.error('Error fetching user data:', error.response?.data || error.message);
         alert('There was an error loading the user data.');
@@ -161,14 +171,14 @@ const UsersRList = () => {
 
       {/* User List */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-center w-full max-w-6xl">
-        {users.map((user) => (
+        {users.map((user, index) => (
           <div key={user.id} className="flex flex-col items-center bg-gray-900 p-2 rounded-lg shadow-md">
             <img src={user.avatar_url} alt={user.fullname} className="w-16 h-16 rounded-full mb-2" />
             <h3 className="text-sm font-semibold text-white">{user.fullname}</h3>
             <p className="text-xs text-gray-400">PIN: {user.pin}</p>
             <div className="flex space-x-2 mt-2 w-full">
               <button
-                onClick={() => handleEditUser(user.id)}
+                onClick={() => handleEditUser(index)}
                 className="bg-yellow-500 text-xs px-2 py-1 rounded hover:bg-yellow-600 transition-colors w-full"
               >
                 Edit
