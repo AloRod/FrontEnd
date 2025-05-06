@@ -66,7 +66,7 @@ const RestrictedUserHome = () => {
                 }
             `;
             
-            const result = await GraphQLClient.query(searchQuery);
+            const result = await GraphQLClient.query(searchQuery); 
             
             if (result && result.searchVideos) {
                 setSearchResults(result.searchVideos);

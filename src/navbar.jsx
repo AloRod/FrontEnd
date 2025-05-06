@@ -12,11 +12,11 @@ const Navbar = () => {
   };
 
   return (
-    <div>
+    <div className= "bg-black">
       {/* Botón para alternar el menú */}
       <button
         onClick={() => setIsMenuOpen(!isMenuOpen)} // Alterna el estado del menú
-        className="fixed top-4 left-4 z-50 bg-blue-950 text-white p-2 rounded-md hover:bg-blue-800"
+        className="ml-6 mt-4 bg-blue-950 text-white p-2 rounded-md hover:bg-blue-800"
       >
         ☰ Menú
       </button>

@@ -16,7 +16,7 @@ class GraphQLClient {
       const response = await axios.post(
         this.baseURL,
         {
-          query: queryString,
+          query: queryString, //recibe el query del RestrictedUserHome
           variables: variables
         },
         {
